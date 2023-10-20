@@ -74,10 +74,7 @@ def main():
     [verify_env_var_presence(e) for e in env_list]
 
     try:
-        git("config", "--global", "--add", "safe.directory", "/app")
-        latest = git("describe", "--tags", "--first-parent", "--match", "[[:digit:]]*.[[:digit:]]*.[[:digit:]]*")\
-            .decode().strip()
-        latest = re.sub(r"(\d+\.\d+\.\d+\-?\d*)(\-?\w*)",r"\1",latest)
+        latest = git("describe", "--tags", "--first-parent", "--match", "[[:digit:]]*.[[:digit:]]*.[[:digit:]]*").decode().strip()
     except subprocess.CalledProcessError:
         # Default to version 1.0.0 if no tags are available
         version = "1.0.0"
