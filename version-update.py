@@ -69,6 +69,42 @@ def tag_repo(tag):
     git("tag", tag)
     git("push", "origin", tag)
 
+def get_latest_tag():
+    """Gets the latest tag."""
+    try:
+        latest_tag = git("describe", "--tags", "--abbrev=0").decode("utf-8").strip()
+        return latest_tag
+    except subprocess.CalledProcessError:
+        return None
+
+
+def get_commit_hash(ref):
+    """Gets the commit hash of a given Git reference (e.g., tag, HEAD)."""
+    try:
+        commit_hash = git("rev-list", "-n", "1", ref).decode("utf-8").strip()
+        return commit_hash
+    except subprocess.CalledProcessError:
+        return None
+
+
+def is_current_commit_tagged():
+    """Checks if the current commit matches the latest tag's commit."""
+    latest_tag = get_latest_tag()
+    if not latest_tag:
+        print("No tags exist in the repository.")
+        return False
+
+    latest_tag_commit = get_commit_hash(latest_tag)
+    current_commit = get_commit_hash("HEAD")
+
+    if latest_tag_commit == current_commit:
+        print(f"Current commit ({current_commit}) matches the latest tag ({latest_tag}).")
+        return True
+    else:
+        print(f"Current commit ({current_commit}) does not match the latest tag ({latest_tag}).")
+        return False
+
+
 def main():
     env_list = ["CI_REPOSITORY_URL", "CI_PROJECT_ID", "CI_PROJECT_URL", "CI_PROJECT_PATH", "NPA_USERNAME", "NPA_PASSWORD"]
     [verify_env_var_presence(e) for e in env_list]
@@ -81,7 +117,8 @@ def main():
         version = "1.0.0"
     else:
         # Skip already tagged commits
-        if '-' not in latest:
+        if is_current_commit_tagged():
+            print("Current commit is already tagged with the latest version.")
             print(latest)
             return 0
 
