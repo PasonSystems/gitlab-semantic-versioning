@@ -74,6 +74,7 @@ def main():
     [verify_env_var_presence(e) for e in env_list]
 
     try:
+        git("fetch", "origin", "refs/tags/*:refs/tags/*", "--prune")
         latest = git("describe", "--tags", "--first-parent", "origin/master", "--match", "[[:digit:]]*.[[:digit:]]*.[[:digit:]]*").decode().strip()
     except subprocess.CalledProcessError:
         # Default to version 1.0.0 if no tags are available
