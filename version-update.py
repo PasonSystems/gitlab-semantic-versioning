@@ -72,7 +72,7 @@ def tag_repo(tag):
 def get_latest_tag():
     """Gets the latest tag."""
     try:
-        latest_tag = git("describe", "--tags", "--abbrev=0").decode("utf-8").strip()
+        latest_tag = git("describe", "--tags", "--first-parent", "origin/master", "--match", "[[:digit:]]*.[[:digit:]]*.[[:digit:]]*").decode("utf-8").strip()
         return latest_tag
     except subprocess.CalledProcessError:
         return None
